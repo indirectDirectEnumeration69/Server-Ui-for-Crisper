@@ -1,4 +1,4 @@
-# Server-Ui-for-Crisper
+# Server-UI-for-Crisper
 UI idea to be implemented into Crisper Project
 
 - Compiles correctly.
