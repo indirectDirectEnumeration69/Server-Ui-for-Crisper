@@ -77,8 +77,7 @@ void CheckServerInstances() {
                     break;
                 }
 
-                std::cout << "      thread " << threadInstance.id << " out of " << totalThreads << ": "
-                    << colorCode << statusStr << "\033[0m" << std::endl;
+                std::cout << "thread " << threadInstance.id << " out of " << totalThreads << ": " << colorCode << statusStr << "\033[0m" << std::endl;
             }
         }
 
