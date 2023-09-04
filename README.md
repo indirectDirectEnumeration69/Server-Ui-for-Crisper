@@ -1,8 +1,8 @@
 # Server-Ui-for-Crisper
 UI idea to be implemented into Crisper Project
 
--Compiles correctly.
-- still needing work before thread behaviour is used dynamically for status. 
+- Compiles correctly.
+- Still needing work before thread behaviour is used dynamically for status. 
 
 Dynamic output:
 
