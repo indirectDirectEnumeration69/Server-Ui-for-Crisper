@@ -53,8 +53,8 @@ void CheckServerInstances() {
 
         for (auto& pair : serverInstances) {
             auto& instance = pair.second;
-            std::cout << "  Server " << instance.id << ": " << (instance.status == RUNNING ? "\033[32mRunning\033[0m" : "\033[31mIdle\033[0m") << std::endl;
-            std::cout << "    \033[32mServer " << instance.id << " threads status:\033[0m" << std::endl;
+            std::cout << "  Server " << instance.id << ": "<< (instance.status == RUNNING ? "\033[32mRunning\033[0m" : "\033[31mIdle\033[0m") << std::endl;
+            std::cout << "\033[32mServer " << instance.id << " threads status:\033[0m" << std::endl;
             int totalThreads = instance.threads.size();
 
             for (auto& threadPair : instance.threads) {
@@ -76,9 +76,10 @@ void CheckServerInstances() {
                     colorCode = "\033[31m"; 
                     break;
                 }
-
-                std::cout << "thread " << threadInstance.id << " out of " << totalThreads << ": " << colorCode << statusStr << "\033[0m" << std::endl;
+                std::cout << "thread " << threadInstance.id << " out of " << totalThreads << ": " 
+                   << colorCode << statusStr << "\033[0m" << std::endl;
             }
+            std::cout << "\n" << std::endl;
         }
 
         ready = false;
