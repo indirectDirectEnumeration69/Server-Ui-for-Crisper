@@ -111,6 +111,7 @@ void Server() {
 
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
+    //need to set conditions for server status and instance changes based on thread behaviour.
     updateServerStatus(1, RUNNING);
     updateServerInstance(1, 1, THREAD_RUNNING);
     updateServerInstance(1, 2, THREAD_IDLE);
