@@ -2,6 +2,7 @@
 #include <concurrent_unordered_set.h>
 #include <unordered_set>
 #include <unordered_map>
+
 //start of region
 #ifndef ALGO //if not defined
 #define ALGO 0000000000 //define
@@ -60,6 +61,14 @@ struct ALGOs {
 };
 
 
+template<typename A>
+A FindAlgorithm(A Algorithm,A Index) {
+
+	
+}
+
+
+
 template<typename T> 
 struct Algorithm {
 
@@ -82,6 +91,9 @@ struct Algorithm {
 
 
 
+
+
+//will be placed somewhere else
 template <typename N> 
 struct Key {
 
@@ -105,6 +117,9 @@ struct Key {
 	~Key() {
 
 	}
+private: 
+	concurrency::concurrent_unordered_set<N> Keys;
+	concurrency::concurrent_unordered_multiset<N> KeyDuplicates;
 };
 
 
