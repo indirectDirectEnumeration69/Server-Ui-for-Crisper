@@ -1,5 +1,7 @@
 #pragma once
-
+#include <concurrent_unordered_set.h>
+#include <unordered_set>
+#include <unordered_map>
 //start of region
 #ifndef ALGO //if not defined
 #define ALGO 0000000000 //define
@@ -58,11 +60,39 @@ struct ALGOs {
 };
 
 
+template<typename T> 
+struct Algorithm {
 
+	bool ListEmpty = false;
+
+
+	std::unordered_set<T> Algo_List;
+	
+
+
+	Algorithm() = default;
+
+
+	~Algorithm() {
+
+	}
+};
+
+
+
+
+
+template <typename N> 
 struct Key {
+
+	std::unordered_map<N, N> KeysToId;
+
 	struct ID {
 
 		ID() {
+
+
+
 
 		}
 		~ID() {
