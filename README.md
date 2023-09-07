@@ -2,7 +2,7 @@
 UI idea to be implemented into Crisper Project
 
 - Compiles correctly.
-- Still needing work before thread behaviour is used dynamically for status. 
+- Still needing work before thread behaviour is used dynamically for status completely. 
 
 [Dynamic Output] :
 
