@@ -1,16 +1,10 @@
 #pragma once
 #include "ERRORManager.h"
-
-
-
 //NOTE//
 /*
-
 #error will cause the error message currently before compile, remove it if you wish for the code to work, as i finish
  the logic.
-
 */
-
 
 // New region
 #define READY false 
