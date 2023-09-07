@@ -49,7 +49,14 @@ functions as macros before runtime.
 #endif
 //end of region 
 
+
+
+
+template <typename Algorithm>  
+
 struct ALGOs {
+	
+	std::unordered_set<Algorithm> AlgorithmList;
 
 
 	ALGOs() {
@@ -86,6 +93,7 @@ struct Algorithm {
 
 	}
 };
+
 
 
 
