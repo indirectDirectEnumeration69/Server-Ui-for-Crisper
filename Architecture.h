@@ -39,6 +39,6 @@ constexpr bool isDebug = true;
 constexpr bool isDebug = false;
 #endif
 #endif
-
-
+//                                                         ||||||
+// used to determine macro inclusions for operating system vvvvvv
 //https://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
