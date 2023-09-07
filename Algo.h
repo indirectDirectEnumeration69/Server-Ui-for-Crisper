@@ -49,16 +49,20 @@ functions as macros before runtime.
 #endif
 //end of region 
 
-
-
+//new region
+#ifdef ALGO 
+#include "Algorithms.h"
+#endif 
+//end of region
 
 template <typename Algorithm>  
 struct ALGOs {
-	bool ListEmpty = false;
+	bool ListEmpty;
+
 	std::unordered_set<Algorithm> AlgorithmList;
 
 	ALGOs() {
-
+		ListEmpty = AlgorithmList.empty();
 	}
 	~ALGOs() {
 
@@ -66,6 +70,8 @@ struct ALGOs {
 };
 
 
+
+//FIND ALGO CURRENTLY BEING USED.
 template<typename A>
 A FindAlgorithm(A Algorithm,A Index) {
 
