@@ -1,10 +1,17 @@
 #pragma once
 #include "ERRORManager.h"
+#include "Architecture.h"
+
+#ifdef UNKNOWN
+#error "unknown, sorry dont know the operating system, whoops....."
+#endif
+
 //NOTE//
 /*
 #error will cause the error message currently before compile, remove it if you wish for the code to work, as i finish
  the logic.
 */
+
 
 // New region
 #define READY false 
@@ -16,9 +23,8 @@
 #endif
 
 #if READY == false
-#error "Ready is false, cannot continue!" 
+//#error "Ready is false, cannot continue!" 
 #elif READY == true
-#include <concurrent_unordered_set.h>
 #include <unordered_set>
 #include <unordered_map>
 #endif
