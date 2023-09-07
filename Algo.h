@@ -75,7 +75,7 @@ A FindAlgorithm(A Algorithm,A Index) {
 
 
 
-//THIS HEADER WILL RELATE TO THE MACRO BEING USED.
+//THIS STRUCT WILL RELATE TO THE MACRO BEING USED.
 template<typename T> 
 struct ALGOMACRO{
 
