@@ -53,11 +53,9 @@ functions as macros before runtime.
 
 
 template <typename Algorithm>  
-
 struct ALGOs {
-	
+	bool ListEmpty = false;
 	std::unordered_set<Algorithm> AlgorithmList;
-
 
 	ALGOs() {
 
@@ -76,20 +74,19 @@ A FindAlgorithm(A Algorithm,A Index) {
 
 
 
+
+//THIS HEADER WILL RELATE TO THE MACRO BEING USED.
 template<typename T> 
-struct Algorithm {
-
-	bool ListEmpty = false;
-
+struct ALGOMACRO{
 
 	std::unordered_set<T> Algo_List;
 	
 
 
-	Algorithm() = default;
+	ALGOMACRO() = default;
 
 
-	~Algorithm() {
+	~ALGOMACRO() {
 
 	}
 };
