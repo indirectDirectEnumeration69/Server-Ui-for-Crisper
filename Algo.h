@@ -1,7 +1,35 @@
 #pragma once
+#include "ERRORManager.h"
+
+
+
+//NOTE//
+/*
+
+#error will cause the error message currently before compile, remove it if you wish for the code to work, as i finish
+ the logic.
+
+*/
+
+
+// New region
+#define READY false 
+#define NOT_READY true
+
+#if NOT_READY == false
+#undef READY
+#define READY true
+#endif
+
+#if READY == false
+#error "Ready is false, cannot continue!" 
+#elif READY == true
 #include <concurrent_unordered_set.h>
 #include <unordered_set>
 #include <unordered_map>
+#endif
+// End of region
+
 
 //start of region
 #ifndef ALGO //if not defined
