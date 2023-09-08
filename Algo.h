@@ -2,8 +2,8 @@
 #include "ERRORManager.h"
 #include "Architecture.h"
 
-#ifdef UNKNOWN
-#error "unknown, sorry dont know the operating system, whoops....."
+#ifdef UNKNOWN 
+#error "unknown, sorry dont know the operating system, whoops..... (Algo.h line 6)"
 #endif
 
 //NOTE//
@@ -23,7 +23,7 @@
 #endif
 
 #if READY == false
-//#error "Ready is false, cannot continue!" 
+//#error "Ready is false, cannot continue! (Algo.h line 26)" 
 #elif READY == true
 #include <unordered_set>
 #include <unordered_map>
