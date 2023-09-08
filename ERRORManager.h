@@ -2,6 +2,7 @@
 #include <iostream>
 #include <variant> //std 17
 
+//start of region
 struct error_list {
     error_list() = default;
 };
@@ -25,5 +26,7 @@ std::variant<error_list, no_error> ErrorStruct() {
 #else
     return no_error{};
 #endif
-}
+} 
+//end of region
+
 //need to set up conditions for include and manage #include more logically across each header.
