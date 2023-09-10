@@ -1,7 +1,7 @@
 #pragma once
 #include <variant> 
 
-#ifndef ERROR_NOW 
+#ifdef ERROR_NOW 
 struct Deconstruction
 {
     ~Deconstruction() {};
