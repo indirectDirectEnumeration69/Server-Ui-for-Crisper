@@ -27,6 +27,9 @@
 #if READY == false
 //#error "Ready is false, cannot continue! (Algo.h line 26)" 
 #elif READY == true
+#define UNORDERED_SET true
+#define UNORDERED_MAP true
+
 #include <unordered_set>
 #include <unordered_map>
 #endif
