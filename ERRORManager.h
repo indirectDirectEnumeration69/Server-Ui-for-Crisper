@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#ifdef ERROR_NOW
+#ifndef ERROR_NOW
 
 struct Deconstruction
 {   
@@ -47,7 +47,7 @@ struct error_list {
         return ErrorType::Unknown;
     }
 
-#ifdef ERROR_NOW
+#ifndef ERROR_NOW
     decltype(Call()) error;
     error_list() {
         try {

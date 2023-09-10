@@ -5,7 +5,10 @@
 #if !defined UNKNOWN
 #include "Server.h"
 #else
+#ifndef  ERROR_NOW
+#define ERROR_NOW
 #error "unknown, sorry dont know the operating system, whoops..... (Algo.h line 6)"
+#endif
 #endif
 
 //NOTE//

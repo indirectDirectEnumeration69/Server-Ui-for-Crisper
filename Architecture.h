@@ -1,12 +1,60 @@
 #pragma once
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <functional>
+
+#ifdef __linux__
+#if __has_include(<sys/types.h>)
+#include <sys/types.h>
+
+#else
+#define LINUX_HEADER_MISSING
+#error "sys/types.h file is missing."
+#endif
+#if __has_include(<sys/stat.h>)
+#include <sys/stat.h>
+
+#else
+#define LINUX_HEADER_MISSING
+#error "sys/stat.h file is missing."
+#endif
+#if __has_include(<fcntl.h>)
+#include <fcntl.h>
+
+#else
+#define LINUX_HEADER_MISSING
+#error "fcntl.h file is missing."
+#endif
+#if __has_include(<sys/ptrace.h>)
+#include <sys/ptrace.h>
+
+#else
+#define LINUX_HEADER_MISSING
+#error "sys/ptrace.h file is missing."
+#endif
+#if __has_include(<unistd.h>)
+#include <unistd.h>
+
+#else
+#define LINUX_HEADER_MISSING
+#error "unistd.h file is missing."
+#endif
+#endif
+
 
 #ifdef _WIN64
 constexpr bool isWindows = true;
 constexpr auto OS = "Windows_64";
+#include <windows.h>
 
 #elif defined(_WIN32)
 constexpr bool isWindows = true;
 constexpr auto OS = "Windows_32";
+#include <windows.h> 
 
 #elif defined(__linux__)
 constexpr bool isWindows = false;
@@ -20,7 +68,7 @@ constexpr auto OS = "Mac";
 constexpr bool isWindows = false;
 constexpr auto OS = "Unix";
 
-#elif defined(__posix)
+#elif defined(__posix__)
 constexpr bool isWindows = false;
 constexpr auto OS = "Posix";
 
@@ -38,7 +86,104 @@ constexpr bool isDebug = true;
 #else
 constexpr bool isDebug = false;
 #endif
+
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+#include <intrin.h>
+#include <fcntl.h>
 #endif
+
+inline bool checkDebuggerLinux() {
+#ifdef __linux__
+    if (ptrace(PTRACE_TRACEME, 0, 1, 0) == -1) {
+        return true; 
+    }
+#endif
+    return false;
+}
+
+inline bool checkTamperingLinux() {
+#ifdef __linux__
+    int fd = open("/proc/self/maps", O_RDONLY);
+    if (fd == -1) {
+        return true;
+    }
+    close(fd);
+#endif
+    return false;
+}
+
+#include <random>
+inline bool checkCPUID() {
+#if defined(_WIN64) || defined(_WIN32)
+    if (IsDebuggerPresent()) {
+        exit(EXIT_FAILURE);
+    }
+#endif
+
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+    int CPUInfo[4] = { -1 };
+    __cpuid(CPUInfo, 1);
+    return (CPUInfo[2] & (1 << 5)) != 0;
+#else
+    return false;
+#endif
+}
+
+inline bool checkDrivers() {
+#if defined(_WIN64) || defined(_WIN32)
+    if (IsDebuggerPresent()) {
+        exit(EXIT_FAILURE);
+    }
+#endif
+
+    std::ifstream f("/sys/class/dmi/id/product_name");
+    if (f.is_open()) {
+        std::string line;
+        std::getline(f, line);
+        return (line.find("VirtualBox") != std::string::npos || line.find("VMware") != std::string::npos);
+    }
+    return false;
+}
+
+inline bool checkTiming() {
+#if defined(_WIN64) || defined(_WIN32)
+    if (IsDebuggerPresent()) {
+        exit(EXIT_FAILURE); 
+    }
+#endif
+
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+    auto start = __rdtsc();
+    for (volatile int i = 0; i < 10000; ++i) {}
+    auto end = __rdtsc();
+    return (end - start) < 1000;
+#else
+    return false;
+#endif
+}
+
+inline bool isVirtual() {
+    std::vector<std::function<bool()>> checks = { checkCPUID, checkDrivers, checkTiming };
+#if defined(__linux__)
+    checks.push_back(checkDebuggerLinux);
+    checks.push_back(checkTamperingLinux);
+#endif
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(checks.begin(), checks.end(), g);
+
+    for (auto& check : checks) {
+        if (check()) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
+
+
+
 //                                                         ||||||
 // used to determine macro inclusions for operating system vvvvvv
 //https://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
