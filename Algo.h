@@ -2,7 +2,9 @@
 #include "ERRORManager.h"
 #include "Architecture.h"
 
-#ifdef UNKNOWN 
+#if !defined UNKNOWN
+#include "Server.h"
+#else
 #error "unknown, sorry dont know the operating system, whoops..... (Algo.h line 6)"
 #endif
 

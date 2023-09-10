@@ -1,4 +1,5 @@
 #pragma once
+#if defined(_WIN32) || defined(_WIN64)
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -67,3 +68,4 @@ void communicate() {
     closesocket(listenSocket);
     WSACleanup();
 }
+#endif

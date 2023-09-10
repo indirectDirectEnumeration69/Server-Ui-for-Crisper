@@ -1,7 +1,7 @@
 #pragma once
 #include <variant> 
 
-#ifdef ERROR_NOW 
+#ifdef ERROR_NOW
 struct Deconstruction
 {
     ~Deconstruction() {};
@@ -25,9 +25,11 @@ auto Call() {return error_acknowledge()();}
 
 struct error_list {
    
-        
+#ifdef ERROR_NOW
     error_list(){Call();};
-    
+#else
+    error_list() = default;
+#endif
     ~error_list() {
         
     }
@@ -50,7 +52,6 @@ constexpr auto CurrentError = ERROR_NOW;
 std::variant<error_list, no_error> ErrorStruct() {
 #if ERRORS
 #if defined(_WIN32) || defined(_WIN64)
-
 #endif
     return error_list{};
 #else
