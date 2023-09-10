@@ -145,6 +145,16 @@ inline bool checkCPUID() {
 #endif
 }
 
+inline std::string xor_encrypt_decrypt(const std::string& input, char key) {
+    std::string output = input;
+
+    for (std::size_t i = 0; i < input.size(); ++i) {
+        output[i] = input[i] ^ key;
+    }
+
+    return output;
+}
+
 inline bool checkDrivers() {
 #if defined(_WIN64) || defined(_WIN32)
     if (IsDebuggerPresent()) {
@@ -152,11 +162,15 @@ inline bool checkDrivers() {
     }
 #endif
 
-    std::ifstream f("/sys/class/dmi/id/product_name");
+    std::ifstream f("/sys/class/dmi/id/product_name"); 
     if (f.is_open()) {
-        std::string line;
-        std::getline(f, line);
-        return (line.find("VirtualBox") != std::string::npos || line.find("VMware") != std::string::npos);
+        std::string L;
+        std::getline(f, L);
+
+        std::string B = xor_encrypt_decrypt("\x4D\x57\x4B\x42\x58\x4D\x47\x4A", '\x11');
+        std::string M = xor_encrypt_decrypt("\x55\x5E\x57\x41\x52\x45", '\x11');
+
+        return (L.find(B) != std::string::npos || L.find(M) != std::string::npos);  
     }
     return false;
 }
