@@ -68,4 +68,7 @@ void communicate() {
     closesocket(listenSocket);
     WSACleanup();
 }
+#elif !defined(_WIN32) || !defined(_WIN64)
+
+
 #endif
