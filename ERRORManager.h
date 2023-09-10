@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
 
 struct Deconstruction
 {   
@@ -37,7 +37,9 @@ using MacroErrorType = decltype(Call());
 #endif
 
 struct error_list {
+#ifdef ERROR_NOW
     std::unordered_set<MacroErrorType> Errors{};
+#endif
     enum class ErrorType { Unknown, RuntimeError, OtherError };
     std::unordered_map<std::exception, ErrorType> Mapping{};
     ErrorType error_Enum_mapper(const std::string& what) {
@@ -45,7 +47,7 @@ struct error_list {
         return ErrorType::Unknown;
     }
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
     decltype(Call()) error;
     error_list() {
         try {
