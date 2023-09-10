@@ -1,10 +1,37 @@
 #pragma once
-#include <iostream>
-#include <variant> //std 17
+#include <variant> 
 
-//start of region
+#ifndef ERROR_NOW 
+struct Deconstruction
+{
+    ~Deconstruction() {};
+};
+#define error_acknowledge() [Deconstruct = Deconstruction()] {\
+    struct MacroError { int MacroErrorSignature = -4; const char* ErrorMessage = "Macro error found";\
+                        const char* MacroName = "ERROR_NOW"; bool IsDefined = true;};\
+    return std::variant<MacroError>{MacroError{}};\
+}
+#endif
+
+#if defined(error_acknowledge)
+bool Error_acknowledged = true;
+
+auto Call() {return error_acknowledge()();}
+#else
+#ifndef ERRORS
+#define ERRORS true
+#endif
+#endif
+
 struct error_list {
-    error_list() = default;
+   
+        
+    error_list(){Call();};
+    
+    ~error_list() {
+        
+    }
+   
 };
 
 struct no_error {
@@ -22,11 +49,12 @@ constexpr auto CurrentError = ERROR_NOW;
 
 std::variant<error_list, no_error> ErrorStruct() {
 #if ERRORS
+#if defined(_WIN32) || defined(_WIN64)
+
+#endif
     return error_list{};
 #else
     return no_error{};
 #endif
-} 
-//end of region
-
+}
 //need to set up conditions for include and manage #include more logically across each header.
