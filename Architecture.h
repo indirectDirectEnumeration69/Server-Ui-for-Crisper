@@ -50,11 +50,27 @@
 constexpr bool isWindows = true;
 constexpr auto OS = "Windows_64";
 #include <windows.h>
+#if !defined(PEB) || !defined(_PEB)
+typedef struct _PEB {
+    BYTE Reserved1[2];
+    BYTE BeingDebugged;
+    BYTE Reserved2[21];
+    PVOID LoaderData;
+} PEB, * PPEB;
+#endif
 
 #elif defined(_WIN32)
 constexpr bool isWindows = true;
 constexpr auto OS = "Windows_32";
 #include <windows.h> 
+#if !defined(PEB) || !defined(_PEB)
+typedef struct _PEB {
+    BYTE Reserved1[2];
+    BYTE BeingDebugged;
+    BYTE Reserved2[9];
+    PVOID LoaderData;
+} PEB, * PPEB;
+#endif
 
 #elif defined(__linux__)
 constexpr bool isWindows = false;
@@ -152,6 +168,7 @@ inline bool checkTiming() {
     }
 #endif
 
+
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
     auto start = __rdtsc();
     for (volatile int i = 0; i < 10000; ++i) {}
@@ -162,8 +179,23 @@ inline bool checkTiming() {
 #endif
 }
 
+inline bool SecondaryDebuggerCheck() {
+#if defined(_WIN64)
+    PEB* peb = (PEB*)__readgsqword(0x60);
+#elif defined(_WIN32)
+    PEB* peb = (PEB*)__readfsdword(0x30);
+#endif
+    if (peb && peb->BeingDebugged) {
+        return true;
+    }
+    if (checkTiming()) {
+        return true;
+    }
+    return false;
+}
+
 inline bool isVirtual() {
-    std::vector<std::function<bool()>> checks = { checkCPUID, checkDrivers, checkTiming };
+    std::vector<std::function<bool()>> checks = { checkCPUID, checkDrivers, checkTiming, SecondaryDebuggerCheck };
 #if defined(__linux__)
     checks.push_back(checkDebuggerLinux);
     checks.push_back(checkTamperingLinux);
