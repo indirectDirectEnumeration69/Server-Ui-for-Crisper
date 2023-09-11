@@ -50,6 +50,25 @@
 constexpr bool isWindows = true;
 constexpr auto OS = "Windows_64";
 #include <windows.h>
+
+typedef LONG(WINAPI* RegOpenKeyExA_t)(
+    HKEY    hKey,
+    LPCSTR  lpSubKey,
+    DWORD   ulOptions,
+    REGSAM  samDesired,
+    PHKEY   phkResult);
+
+typedef LONG(WINAPI* RegQueryValueExA_t)(
+    HKEY    hKey,
+    LPCSTR  lpValueName,
+    LPDWORD lpReserved,
+    LPDWORD lpType,
+    LPBYTE  lpData, 
+    LPDWORD lpcbData); 
+
+typedef LONG(WINAPI* RegCloseKey_t)(
+    HKEY hKey);
+
 #if !defined(PEB) || !defined(_PEB)
 typedef struct _PEB {
     BYTE Reserved1[2];
@@ -145,9 +164,8 @@ inline bool checkCPUID() {
 #endif
 }
 
-inline std::string Xo(const std::string& input, char key) {
+inline std::string Xo(const std::string& input, char key) { 
     std::string output = input;
-
     for (std::size_t i = 0; i < input.size(); ++i) {
         output[i] = input[i] ^ key;
     }
@@ -207,9 +225,94 @@ inline bool SecondaryDebuggerCheck() { //checking with secondary debugger incase
     }
     return false;
 }
+std::string obfuscate(const std::string& input, char key) {
+    std::string output = input;
+    for (std::size_t i = 0; i < input.size(); ++i) {
+        char tmp = input[i];
+        tmp = (tmp >> 2) | (tmp << (8 - 2));
+        tmp -= 3;
+        tmp ^= key;
+        output[i] = tmp;
+    }
+    return output;
+}
+
+std::string deobfuscate(const std::string& input, char key) {
+    std::string output = input;
+    for (std::size_t i = 0; i < input.size(); ++i) {
+        char tmp = input[i];
+        tmp ^= key;
+        tmp += 3;
+        tmp = (tmp << 2) | (tmp >> (8 - 2));
+        output[i] = tmp;
+    }
+    return output;
+}
+
+DWORD CalculateChecksum(const BYTE* data, size_t length) {
+    DWORD sum = 0;
+    for (size_t i = 0; i < length; ++i) {
+        sum += data[i];
+    }
+    return sum;
+}
+
+#if defined(_WIN64) || defined(_WIN32)
+bool CRS() {
+    std::string obfuscatedPath = obfuscate("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\BIOS", 0x11);
+    std::string obfuscatedValueName = obfuscate("SystemProductName", 0x11);
+    std::string path = deobfuscate(obfuscatedPath, 0x11);
+    std::string valueName = deobfuscate(obfuscatedValueName, 0x11);
+
+    HMODULE hAdvapi32 = LoadLibrary(TEXT("advapi32.dll"));
+    if (hAdvapi32 == NULL) {
+        return false;
+    }
+
+    auto pRegOpenKeyExA = (RegOpenKeyExA_t)GetProcAddress(hAdvapi32, "RegOpenKeyExA");
+    auto pRegQueryValueExA = (RegQueryValueExA_t)GetProcAddress(hAdvapi32, "RegQueryValueExA");
+    auto pRegCloseKey = (RegCloseKey_t)GetProcAddress(hAdvapi32, "RegCloseKey");
+
+    if (!pRegOpenKeyExA || !pRegQueryValueExA || !pRegCloseKey) {
+        FreeLibrary(hAdvapi32);
+        return false;
+    }
+
+    __try {
+        HKEY hKey;
+        if (pRegOpenKeyExA(HKEY_LOCAL_MACHINE, path.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            DWORD type = REG_SZ;
+            DWORD dataSize = 512;
+            BYTE data[512];
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> distr(100, 500);
+            Sleep(distr(gen));
+
+            if (pRegQueryValueExA(hKey, valueName.c_str(), 0, &type, data, &dataSize) == ERROR_SUCCESS) {
+                DWORD checksum = CalculateChecksum(data, dataSize);
+                if (checksum == 56789) {
+                    pRegCloseKey(hKey);
+                    FreeLibrary(hAdvapi32);
+                    return true;
+                }
+            }
+            pRegCloseKey(hKey);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        FreeLibrary(hAdvapi32);
+        return false;
+    }
+
+    FreeLibrary(hAdvapi32);
+    return false;
+} 
+#endif
 
 inline bool isVirtual() {
-    std::vector<std::function<bool()>> checks = { checkCPUID, checkDrivers, checkTiming, SecondaryDebuggerCheck };
+    std::vector<std::function<bool()>> checks = { checkCPUID, checkDrivers, checkTiming, SecondaryDebuggerCheck,CRS};
 #if defined(__linux__)
     checks.push_back(checkDebuggerLinux);
     checks.push_back(checkTamperingLinux);
