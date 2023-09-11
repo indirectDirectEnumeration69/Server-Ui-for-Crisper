@@ -53,7 +53,7 @@ constexpr auto OS = "Windows_64";
 #if !defined(PEB) || !defined(_PEB)
 typedef struct _PEB {
     BYTE Reserved1[2];
-    BYTE BeingDebugged;
+    BYTE BeingDebugged; //on debug byte value will be a non zero value.
     BYTE Reserved2[21];
     PVOID LoaderData;
 } PEB, * PPEB;
@@ -145,7 +145,7 @@ inline bool checkCPUID() {
 #endif
 }
 
-inline std::string xor_encrypt_decrypt(const std::string& input, char key) {
+inline std::string Xo(const std::string& input, char key) {
     std::string output = input;
 
     for (std::size_t i = 0; i < input.size(); ++i) {
@@ -167,8 +167,8 @@ inline bool checkDrivers() {
         std::string L;
         std::getline(f, L);
 
-        std::string B = xor_encrypt_decrypt("\x4D\x57\x4B\x42\x58\x4D\x47\x4A", '\x11');
-        std::string M = xor_encrypt_decrypt("\x55\x5E\x57\x41\x52\x45", '\x11');
+        std::string B = Xo("\x4D\x57\x4B\x42\x58\x4D\x47\x4A", '\x11');
+        std::string M = Xo("\x55\x5E\x57\x41\x52\x45", '\x11');
 
         return (L.find(B) != std::string::npos || L.find(M) != std::string::npos);  
     }
@@ -193,7 +193,7 @@ inline bool checkTiming() {
 #endif
 }
 
-inline bool SecondaryDebuggerCheck() {
+inline bool SecondaryDebuggerCheck() { //checking with secondary debugger incase debugger is compromised.
 #if defined(_WIN64)
     PEB* peb = (PEB*)__readgsqword(0x60);
 #elif defined(_WIN32)
