@@ -1,6 +1,9 @@
 #pragma once
 #include "ERRORManager.h"
 #include "Architecture.h"
+#include <concurrent_unordered_set.h>
+#include <concurrent_unordered_map.h>
+
 
 #if !defined UNKNOWN
 #include "Server.h"
@@ -165,7 +168,7 @@ struct Key {
 
 	}
 private: 
-	concurrency::concurrent_unordered_set<N> Keys;
+	concurrency::concurrent_unordered_set<N> Keys; 
 	concurrency::concurrent_unordered_multiset<N> KeyDuplicates;
 };
 
