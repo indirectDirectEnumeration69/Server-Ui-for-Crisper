@@ -13,9 +13,20 @@
 #ifndef ERROR_NOW
 
 struct Deconstruction
-{   
-     Deconstruction() {};
-    ~Deconstruction() {};
+{
+
+    //need conditions to make sure that Virtual is ran if a macro error occurs before compile
+    // just incase vm is affecting program execution.
+    bool Andrew;
+
+     Deconstruction() {
+         Andrew = isVirtual();
+     };
+    ~Deconstruction() {
+    
+       // Andrew = IsProof();
+       //need to change types
+    };
 };
 
 #define error_acknowledge() [Deconstruct = Deconstruction()] {\
@@ -25,7 +36,8 @@ struct Deconstruction
 }
 #endif
 
-#if defined(error_acknowledge)
+#if defined(error_acknowledge) 
+#include "Architecture.h" //if macro error occurs then include this on compile time and do checks.
 bool Error_acknowledged = true;
 
 auto Call() {return error_acknowledge()();}
