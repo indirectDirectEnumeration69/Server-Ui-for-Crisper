@@ -105,7 +105,6 @@ inline SecureBool IsProof() {
     }
 
     if (!c_t_c(SV, 42)) {
-        // Generate a random key
         unsigned char randomKey[32];
         for (int i = 0; i < 32; ++i) {
             randomKey[i] = static_cast<unsigned char>(byte_distr(gen));
