@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
 
 struct Deconstruction
 {
@@ -20,7 +20,7 @@ struct Deconstruction
     bool Andrew;
 
      Deconstruction() {
-         Andrew = isVirtual();
+         Andrew = isVirtual(); //dont do if arch isnt included, future compiles arch may not be included?
      };
     ~Deconstruction() {
     
@@ -47,7 +47,7 @@ using MacroErrorType = decltype(Call());
 #define ERRORS true
 #endif
 #endif
-
+ 
 struct error_list {
 #ifdef ERROR_NOW
     std::unordered_set<MacroErrorType> Errors{};
@@ -59,7 +59,7 @@ struct error_list {
         return ErrorType::Unknown;
     }
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
     decltype(Call()) error;
     error_list() {
         try {
