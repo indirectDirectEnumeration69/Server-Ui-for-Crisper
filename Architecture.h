@@ -256,59 +256,64 @@ DWORD CalculateChecksum(const BYTE* data, size_t length) {
     }
     return sum;
 }
-
 #if defined(_WIN64) || defined(_WIN32)
+
+extern "C" bool RegistryQueryAndCheck(HKEY hKey, const char* path, const char* valueName, BYTE * data, DWORD * dataSize, DWORD * checksum) {
+    DWORD type = REG_SZ;
+
+    __try {
+        HMODULE hAdvapi32 = LoadLibrary(TEXT("advapi32.dll"));
+        if (hAdvapi32 == NULL) {
+            return false;
+        }
+
+        auto pRegQueryValueExA = (RegQueryValueExA_t)GetProcAddress(hAdvapi32, "RegQueryValueExA");
+        if (pRegQueryValueExA == NULL) {
+            FreeLibrary(hAdvapi32);
+            return false;
+        }
+
+        if (pRegQueryValueExA(hKey, valueName, 0, &type, data, dataSize) != ERROR_SUCCESS) {
+            FreeLibrary(hAdvapi32);
+            return false;
+        }
+
+        *checksum = CalculateChecksum(data, *dataSize);
+        FreeLibrary(hAdvapi32);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+
+    return true;
+}
+
 bool CRS() {
+    BYTE data[512];
+    DWORD dataSize = 512;
+    DWORD checksum = 0;
+    HKEY hKey;
+
     std::string obfuscatedPath = obfuscate("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\BIOS", 0x11);
     std::string obfuscatedValueName = obfuscate("SystemProductName", 0x11);
     std::string path = deobfuscate(obfuscatedPath, 0x11);
     std::string valueName = deobfuscate(obfuscatedValueName, 0x11);
 
-    HMODULE hAdvapi32 = LoadLibrary(TEXT("advapi32.dll"));
-    if (hAdvapi32 == NULL) {
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, path.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
         return false;
     }
 
-    auto pRegOpenKeyExA = (RegOpenKeyExA_t)GetProcAddress(hAdvapi32, "RegOpenKeyExA");
-    auto pRegQueryValueExA = (RegQueryValueExA_t)GetProcAddress(hAdvapi32, "RegQueryValueExA");
-    auto pRegCloseKey = (RegCloseKey_t)GetProcAddress(hAdvapi32, "RegCloseKey");
-
-    if (!pRegOpenKeyExA || !pRegQueryValueExA || !pRegCloseKey) {
-        FreeLibrary(hAdvapi32);
-        return false;
-    }
-
-    __try {
-        HKEY hKey;
-        if (pRegOpenKeyExA(HKEY_LOCAL_MACHINE, path.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-            DWORD type = REG_SZ;
-            DWORD dataSize = 512;
-            BYTE data[512];
-
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> distr(100, 500);
-            Sleep(distr(gen));
-
-            if (pRegQueryValueExA(hKey, valueName.c_str(), 0, &type, data, &dataSize) == ERROR_SUCCESS) {
-                DWORD checksum = CalculateChecksum(data, dataSize);
-                if (checksum == 56789) {
-                    pRegCloseKey(hKey);
-                    FreeLibrary(hAdvapi32);
-                    return true;
-                }
-            }
-            pRegCloseKey(hKey);
+    if (RegistryQueryAndCheck(hKey, path.c_str(), valueName.c_str(), data, &dataSize, &checksum)) {
+        if (checksum == 56789) {
+            RegCloseKey(hKey);
+            return true;
         }
     }
-    __except (EXCEPTION_EXECUTE_HANDLER) {
-        FreeLibrary(hAdvapi32);
-        return false;
-    }
 
-    FreeLibrary(hAdvapi32);
+    RegCloseKey(hKey);
     return false;
-} 
+}
+
 #endif
 
 inline bool isVirtual() {

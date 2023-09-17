@@ -122,8 +122,8 @@ inline SecureBool IsProof() {
     std::this_thread::sleep_for(std::chrono::microseconds(byte_distr(gen)));
 #ifdef __GNUC__
     asm("nop");
-#elif _MSC_VER
-    __asm nop;
+#elif _MSC_VER 
+    __nop();  
 #endif
     volatile int ASV = 84;
 

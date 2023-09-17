@@ -107,7 +107,9 @@ constexpr auto CurrentError = ERROR_NOW;
 #error "AN ERROR HAS OCCURRED.."
 #define ERRORS true
 #else
+#undef ERRORS
 #define ERRORS false
+#undef NO_ERROR
 #define NO_ERROR() do { std::cout << "NO ERRORS, GOOD TO PROCEED"; } while(0)
 #endif
 
