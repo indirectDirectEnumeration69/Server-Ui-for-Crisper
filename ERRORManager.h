@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#ifdef ERROR_NOW
+#ifndef ERROR_NOW
 
 struct Deconstruction
 {
@@ -59,7 +59,7 @@ struct error_list {
         return ErrorType::Unknown;
     }
 
-#ifdef ERROR_NOW
+#ifndef ERROR_NOW
     decltype(Call()) error;
     error_list() {
         try {
@@ -68,12 +68,13 @@ struct error_list {
                 if constexpr (requires { MacroArg.MacroErrorSignature; }) {
                     std::cout << MacroArg.MacroErrorSignature << std::endl;
                     std::cout << MacroArg.ErrorMessage << std::endl;
-                }else { }
+                }
+                else {}
                 }, error);
         } //std 20 dependent.
         catch (const std::runtime_error& RE) {
             ErrorType err = error_Enum_mapper(RE.what());
-            
+
             switch (err) {
             case ErrorType::RuntimeError:
                 std::cout << "Caught a specific runtime error\n";
@@ -93,9 +94,29 @@ struct error_list {
     error_list() = default;
 #endif
     ~error_list() {
-        
+        struct ELCheck_ {};
+        typedef  ELCheck_* ELStruct_ptr;  
+        auto ELCheck = [this]() -> ELCheck_* {
+            ELStruct_ptr ELcheckNew = nullptr;
+             
+            if (Mapping.empty()) {
+                ELcheckNew = new ELCheck_{
+
+                    
+
+
+                };
+            }
+
+            return ELcheckNew;
+        };
+
+        ELCheck_* EL = ELCheck();
+
+        if (EL) {
+            delete EL;  
+        }
     }
-   
 };
 
 struct no_error {
