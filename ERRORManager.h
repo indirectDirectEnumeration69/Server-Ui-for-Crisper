@@ -1,6 +1,7 @@
 #pragma once
 #include <variant> 
-
+#include <chrono>
+#include <deque> 
 #ifndef UNORDERED_SET
 #include <unordered_set>
 #define UNORDERED_SET true 
@@ -10,7 +11,7 @@
 #endif
 #endif
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
 
 struct Deconstruction
 {
@@ -59,7 +60,7 @@ struct error_list {
         return ErrorType::Unknown;
     }
 
-#ifndef ERROR_NOW
+#ifdef ERROR_NOW
     decltype(Call()) error;
     error_list() {
         try {
@@ -94,27 +95,34 @@ struct error_list {
     error_list() = default;
 #endif
     ~error_list() {
-        struct ELCheck_ {};
-        typedef  ELCheck_* ELStruct_ptr;  
+        struct ELCheck_ {
+#if defined(error_acknowledge) 
+            std::vector<MacroErrorType> MacroErrors{};
+#endif
+            std::chrono::system_clock::time_point timeStamp;
+            int errorCount = 0;  
+            enum class Severity { Low, Medium, High };
+            std::vector<Severity> severities;
+            std::deque<std::string> errorHistory;
+#if defined(error_acknowledge) 
+            void HandleError(const MacroErrorType& error) {
+               
+            }
+#endif
+        };
+        typedef  ELCheck_* ELStruct_ptr;
         auto ELCheck = [this]() -> ELCheck_* {
             ELStruct_ptr ELcheckNew = nullptr;
-             
             if (Mapping.empty()) {
-                ELcheckNew = new ELCheck_{
-
-                    
-
-
-                };
+                ELcheckNew = new ELCheck_{};
             }
-
             return ELcheckNew;
         };
 
         ELCheck_* EL = ELCheck();
-
+         
         if (EL) {
-            delete EL;  
+            delete EL;
         }
     }
 };
@@ -126,6 +134,9 @@ struct no_error {
 #ifdef ERROR_NOW
 constexpr auto CurrentError = ERROR_NOW;
 #error "AN ERROR HAS OCCURRED.."
+#if defined(ERRORS)
+#undef ERRORS
+#endif
 #define ERRORS true
 #else
 #undef ERRORS
