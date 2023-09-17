@@ -101,7 +101,7 @@ struct error_list {
 #endif
             std::chrono::system_clock::time_point timeStamp; 
             int errorCount = 0;  
-            enum class Severity { Low, Medium, High };
+            enum class Severity { Low, Medium, High, Critical }; //critical system processes in context of the program runtime.
             std::vector<Severity> severities;
             std::deque<std::string> errorHistory;
             ELCheck_() : timeStamp(std::chrono::system_clock::now()), errorCount(1) {}
