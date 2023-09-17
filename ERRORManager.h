@@ -11,7 +11,7 @@
 #endif
 #endif
 
-#ifdef ERROR_NOW
+#ifdef ERROR_NOW 
 
 struct Deconstruction
 {
@@ -96,17 +96,23 @@ struct error_list {
 #endif
     ~error_list() {
         struct ELCheck_ {
-#if defined(error_acknowledge) 
+#if defined(error_acknowledge)  
             std::vector<MacroErrorType> MacroErrors{};
 #endif
-            std::chrono::system_clock::time_point timeStamp;
+            std::chrono::system_clock::time_point timeStamp; 
             int errorCount = 0;  
             enum class Severity { Low, Medium, High };
             std::vector<Severity> severities;
             std::deque<std::string> errorHistory;
+            ELCheck_() : timeStamp(std::chrono::system_clock::now()), errorCount(1) {}
 #if defined(error_acknowledge) 
             void HandleError(const MacroErrorType& error) {
-               
+                timeStamp = std::chrono::system_clock::now();
+                std::visit([&](auto& MacroArg) {
+                    if constexpr (requires { MacroArg.MacroErrorSignature; }) {
+                        errorHistory.push_back(MacroArg.ErrorMessage); 
+                    }
+                    }, error);
             }
 #endif
         };
@@ -114,8 +120,15 @@ struct error_list {
         auto ELCheck = [this]() -> ELCheck_* {
             ELStruct_ptr ELcheckNew = nullptr;
             if (Mapping.empty()) {
-                ELcheckNew = new ELCheck_{};
-            }
+                ELcheckNew = new ELCheck_{
+                    
+                };
+                if (ELcheckNew) {
+                    /*ELcheckNew->severities., */ //functiion for this,emplacing threads with a priority based on the error. (clean up checks ..)
+                    ELcheckNew->errorCount++; //could expand to be for sub errors within a general error , counted as error 1 on construction.
+
+                }
+            } 
             return ELcheckNew;
         };
 
