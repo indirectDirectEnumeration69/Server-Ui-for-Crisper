@@ -48,8 +48,8 @@ public:
         long long int RVb = *reinterpret_cast<long long int*>(buffer); 
         std::cout << "Random value: " << RVb << std::endl;  
 
-        std::string filename = std::to_string(RVb); // Convert long long int to string
-        std::ofstream outFile(filename); // Open the file
+        std::string filename = std::to_string(RVb); 
+        std::ofstream outFile(filename);
 
         if (outFile.is_open()) {
             outFile << "ProcArch: " << architecture << std::endl;
