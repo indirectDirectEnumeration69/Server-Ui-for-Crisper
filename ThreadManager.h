@@ -11,7 +11,7 @@
 
 class ThreadControlSystem {
 public:
-    static DWORD WINAPI ISX86(LPVOID lpParam)
+    static DWORD WINAPI ISX86(LPVOID lpParam) //static or causes errors as the thread has to have a static type and within winapi call __stdcall is not static.
     {
         SYSTEM_INFO si;
         GetSystemInfo(&si);
