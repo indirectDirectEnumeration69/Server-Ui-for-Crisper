@@ -9,6 +9,7 @@
 #include <openssl/sha.h> 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
+#include <any>
  
 std::string encrypt(const std::string& plainText, const unsigned char* key)
 {
@@ -75,21 +76,123 @@ struct SecureBool {
 };
 
 
-inline bool c_t_c(int a, int b) {
-    volatile int result = 0;
-    result |= (a ^ b);
-    return result == 0;
+inline bool c_t_c(int alpha, int beta) {
+    typedef int(*SysFnPtr)(int, int);
+
+    HMODULE sysModule = LoadLibrary(TEXT("user32.dll"));
+    SysFnPtr dynamicFn = nullptr;
+
+    if (sysModule != nullptr) {
+        dynamicFn = (SysFnPtr)GetProcAddress(sysModule, "MessageBoxW");
+    }
+
+    volatile int omega1, omega2, omega3, omega4, omega5;
+    std::random_device randEntropySrc;
+
+    volatile int* indirectModifier;
+    int nebulousConst = randEntropySrc.entropy() > 0 ? 27 : 33;
+
+    if (randEntropySrc.entropy() > 0) {
+        omega1 = 0, omega2 = nebulousConst, omega3 = 19, omega4 = 37, omega5 = 97;
+        indirectModifier = &omega4;
+
+        std::uniform_int_distribution<> distr(0, nebulousConst);
+        int randVar = distr(randEntropySrc);
+
+        omega1 |= ((((alpha ^ beta) * omega2 + *indirectModifier + randVar)
+            / (omega3 + omega5) + omega3)
+            - omega2 * omega4 / omega5) & 0xFFFFFFF;
+    }
+    else {
+        omega1 = (alpha > beta) ? nebulousConst ^ 0x1332 : nebulousConst ^ 0x1337;
+        omega2 = nebulousConst;
+        omega3 = (alpha != beta) ? omega2 * omega2 : ~omega2 * ~omega2;
+        omega4 = nebulousConst | 0x3;
+        omega5 = nebulousConst & 0x7;
+    }
+
+    int cryptoMask = omega1 & reinterpret_cast<int>(dynamicFn);
+    int finalMangle = (cryptoMask | omega1) ^ omega5;
+
+    FreeLibrary(sysModule);
+
+    std::random_device pseudoRandSrc;
+    std::mt19937 gen1(pseudoRandSrc());
+    std::uniform_int_distribution<> postMangleDistr(0, 1);
+
+    return ((finalMangle + omega2 + postMangleDistr(gen1)) % (omega3 + omega4))
+        ? true
+        : !((omega1 - omega2 + cryptoMask) / (omega3 + omega4));
 }
+
 inline SecureBool IsProof() {
-    auto dople = [](int x) { return x * 2 - x; };
-    auto endStopRunNow = [](bool x) { return !x ? true : false; };
+    std::random_device rd;
+    std::mt19937 g(rd());
+    bool result = true;
+    bool b = true;
+    auto CF1 = [](bool x) { 
+        bool a = x, b = !x, c = x && true, d = x || false;
+        return (((a && b) || (c && d)) && !(a || b) && (c || d)) ? true : !true;
+    };
+    auto CF2 = [](bool x) {
+        bool q = !x, r = x || false, s = x && true, t = !x || true;
+        return (q && r && s && t) ? (q || r) : (s || t);
+    };
 
-    auto CF1 = [](bool x) { return x && true; };
-    auto CF2 = [](bool x) { return !x || false; };
-    auto CF3 = [](bool x, bool y) { return x && y; }; 
+    auto CF3 = [](bool x, bool y) {
+        bool m = x, n = y, o = x && y, p = x || y;
+        return (((m && n) || (o && p)) && !(m || n) && (o || p)) ? o : !p;
+    };
 
+    std::vector<std::function<bool(bool, bool)>> control_flows; 
+    control_flows.push_back([=](bool x, bool y) { return CF1(x); });
+    control_flows.push_back([=](bool x, bool y) { return CF2(x); }); 
+    control_flows.push_back([=](bool x, bool y) { return CF3(x, y); });
 
-    int a = dople(1);
+    std::shuffle(control_flows.begin(), control_flows.end(), g);
+
+    std::vector<int> order{1, 2, 3};
+    std::shuffle(order.begin(), order.end(), g);
+
+#if defined(PUSH_CF_LAMBDA_1ARG) || defined(PUSH_CF_LAMBDA_2ARG)
+#undef PUSH_CF_LAMBDA_1ARG
+#undef PUSH_CF_LAMBDA_2ARG
+#endif
+
+#define PUSH_CF_LAMBDA_1ARG(cf_lambda) control_flows.push_back([=](bool x, bool y) { return cf_lambda(x); })
+#define PUSH_CF_LAMBDA_2ARG(cf_lambda) control_flows.push_back([=](bool x, bool y) { return cf_lambda(x, y); })
+    for (int i : order) {
+        if (i == 1) {
+            PUSH_CF_LAMBDA_1ARG(CF1); 
+        }
+        else if (i == 2) {
+            PUSH_CF_LAMBDA_1ARG(CF2); 
+        }
+        else if (i == 3) {
+            PUSH_CF_LAMBDA_2ARG(CF3);
+        }
+    }
+#undef PUSH_CF_LAMBDA_1ARG
+#undef PUSH_CF_LAMBDA_2ARG
+
+    if (!control_flows.empty()) { 
+        result = control_flows[0](result, b); 
+    }
+    b = (b != result) ? (b + result) : (b + b * result); 
+    for (const auto& cf : control_flows) {
+        result = cf(result, b);
+    }
+    auto dople = [](int x) {
+        int i = x * 2, j = x * 3, k = x * 4, l = x * 5;
+        return ((i + j + k + l) - (i * j * k * l)) / (j - k + i - l);
+    };
+
+    auto endStopRunNow = [](bool x) { 
+        bool u = !x, v = x || false, w = x && true, z = !x || true;
+        return (u && v && w && z) ? (u || v) : (w || z);
+    };
+
+    int a = dople(1); 
     bool b = endStopRunNow(true);
 
     bool result = isVirtual();

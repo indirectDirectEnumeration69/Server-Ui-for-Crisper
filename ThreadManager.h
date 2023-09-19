@@ -11,7 +11,7 @@
 
 class ThreadControlSystem {
 public:
-    static DWORD WINAPI ISX86(LPVOID lpParam) //static or causes errors as the thread has to have a static type and within winapi call __stdcall is not static.
+    static DWORD WINAPI ISX86(LPVOID lpParam)//static or causes errors as the thread has to have a static type and within winapi call __stdcall is not static.
     {
         SYSTEM_INFO si;
         GetSystemInfo(&si);
@@ -48,7 +48,7 @@ public:
         long long int RVb = *reinterpret_cast<long long int*>(buffer); 
         std::cout << "Random value: " << RVb << std::endl;  
 
-        std::string filename = std::to_string(RVb); 
+        std::string filename = std::to_string(RVb);
         std::ofstream outFile(filename);
 
         if (outFile.is_open()) {

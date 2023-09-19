@@ -122,7 +122,7 @@ constexpr bool isDebug = true;
 constexpr bool isDebug = false;
 #endif
 
-#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64) 
 #include <intrin.h>
 #include <fcntl.h>
 #endif
@@ -334,10 +334,3 @@ inline bool isVirtual() {
     return false;
 }
 #endif
-
-
-
-
-//                                                         ||||||
-// used to determine macro inclusions for operating system vvvvvv
-//https://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
