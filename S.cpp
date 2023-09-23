@@ -10,7 +10,10 @@
  
 
 
-//fixing redefinitions now.
+//fixing redefinitions now
+//changing from random.h
+// fixing issues with other headers.
+//adding linux define code for different os functionality/env functionality.
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #define WIN_INCLUDE true
