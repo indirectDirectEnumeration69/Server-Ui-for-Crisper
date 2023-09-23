@@ -126,7 +126,7 @@ volatile struct QK : J {
      MEMORYSTATUSEX statex;
      statex.dwLength = sizeof(statex);
      if (GlobalMemoryStatusEx(&statex)) {
-         if (statex.ullAvailPhys < (1ULL << 30)) { std::exit(1); }}
+         if (statex.ullAvailPhys < (1ULL << 30)) { std::exit(1); }} //Available physical memory check.
      else {std::exit(1);}return true;}
         virtual ~QK() {}}; QK globalInstance;
 
