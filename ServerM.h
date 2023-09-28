@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "Algo.h"
 
 std::mutex mtx;
 std::condition_variable cv;
@@ -8,13 +9,25 @@ std::atomic<bool> stopCheck{false};
 enum ServerStatus { IDLE, RUNNING };
 enum ThreadStatus { THREAD_IDLE, THREAD_RUNNING, THREAD_STOPPED };
 
+
+struct ServerAlgo {
+    virtual ServerStatus CheckServerStatus() = 0;
+    struct ThreadAlgo { virtual ThreadStatus CheckThreadStatus() = 0; };
+
+    ServerAlgo() {}
+
+};
+
+
+
+
 struct ThreadInstance {
     int id;
     ThreadStatus status;
 };
 
 struct ServerInstance {
-    int id;
+    int id; //ill change later when i have the algo built up
     ServerStatus status;
     std::map<int, ThreadInstance> threads;
 };
@@ -112,6 +125,7 @@ void Server() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     //need to set conditions for server status and instance changes based on thread behaviour.
+        
     updateServerStatus(1, RUNNING);
     updateServerInstance(1, 1, THREAD_RUNNING);
     updateServerInstance(1, 2, THREAD_IDLE);
