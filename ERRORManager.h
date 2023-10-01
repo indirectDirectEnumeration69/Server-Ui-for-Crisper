@@ -6,12 +6,29 @@
 #include <unordered_set>
 #define UNORDERED_SET true 
 #ifndef UNORDED_MAP
-#include <unordered_map>
+#include <unordered_map> //dont necessarily need gaurds.
 #define UNORDERED_MAP true 
 #endif
 #endif
 
-#ifdef ERROR_NOW 
+//loading side modules and dependencies.
+
+
+class ErrorChecker {
+public:
+    int CheckError() {
+
+
+
+        return 0;
+    }
+};
+
+
+
+
+
+#ifdef ERROR_NOW  
 
 struct Deconstruction
 {
@@ -27,7 +44,7 @@ struct Deconstruction
     
        // Andrew = IsProof();
        //need to change types
-    };
+    }; 
 };
 
 #define error_acknowledge() [Deconstruct = Deconstruction()] {\
@@ -46,9 +63,20 @@ using MacroErrorType = decltype(Call());
 #else
 #ifndef ERRORS
 #define ERRORS true
+
+struct SignalError {
+    ErrorChecker EC; 
+    bool PrimarySignal=false;
+    bool SecondarySignal=false;
+    SignalError() {EC.CheckError() == 1 ? PrimarySignal = false : PrimarySignal = true;} 
+    ~SignalError() {
+        PrimarySignal = false;
+        SecondarySignal = false;
+    }
+};
 #endif
 #endif
- 
+
 struct error_list {
 #ifdef ERROR_NOW
     std::unordered_set<MacroErrorType> Errors{};
@@ -88,7 +116,12 @@ struct error_list {
             default: break;
             }
         }
-        catch (...) {
+        catch (std::exception e) { 
+            std::unordered_set<std::string> Exception_e;
+            Exception_e.insert(e.what()); //adding e exception.
+        }
+        catch (...) { //... other exceptions.
+           
         }
     };
 #else
@@ -141,7 +174,7 @@ struct error_list {
 };
 
 struct no_error {
-    no_error() = default;
+    no_error() {  }
 };
 
 #ifdef ERROR_NOW
